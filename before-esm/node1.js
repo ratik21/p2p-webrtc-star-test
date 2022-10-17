@@ -57,6 +57,6 @@ const createNode = async () => {
   });
 
   node.connectionManager.on('peer:connect', async (connection) => {
-    console.log('Disconnected from peer:', connection.remotePeer.toB58String());
+    console.log('Connection established to:', connection.remotePeer.toString());
   });
 })()
