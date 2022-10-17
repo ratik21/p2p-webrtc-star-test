@@ -1,0 +1,28 @@
+{
+  "name": "libp2p-examples",
+  "version": "1.0.0",
+  "description": "Examples of how to use libp2p",
+  "type": "module",
+  "license": "MIT",
+  "dependencies": {
+    "@chainsafe/libp2p-gossipsub": "^4.1.1",
+    "@koush/wrtc": "^0.5.3",
+    "@nodelib/fs.walk": "^1.2.8",
+    "@libp2p/kad-dht": "^4.0.0",
+    "@libp2p/mdns": "^4.0.0",
+    "@libp2p/mplex": "^6.0.2",
+    "@libp2p/pubsub": "^4.0.0",
+    "@libp2p/tcp": "^4.0.0",
+    "@libp2p/webrtc-star": "^4.0.1",
+    "@libp2p/websockets": "^4.0.0",
+    "@libp2p/bootstrap": "^4.0.0",
+    "@chainsafe/libp2p-noise": "^9.0.0",
+    "axios": "^0.27.2",
+    "delay": "^5.0.0",
+    "libp2p": "^0.39.5"
+  },
+  "devDependencies": {
+    "https": "^1.0.0",
+    "playwright": "^1.7.1"
+  }
+}
