@@ -13,6 +13,7 @@ import wrtc from "@koush/wrtc";
 
 const createNode = async () => {
   const transportKey = WebRTCStar.prototype[Symbol.toStringTag]
+  const webRTC = new WebRTCStar({ wrtc: wrtc });
   const node = await createLibp2p({
     addresses: {
       listen: [
@@ -30,7 +31,7 @@ const createNode = async () => {
       dialTimeout: 60000
     },
     transports: [
-      new WebRTCStar({ wrtc: wrtc }), new WebSockets(), new TCP()
+      webRTC, new WebSockets(), new TCP()
     ],
     streamMuxers: [
       new Mplex({
@@ -39,6 +40,7 @@ const createNode = async () => {
       })
     ],
     peerDiscovery: [
+      webRTC.discovery,
       new MulticastDNS({
         interval: 1000
       })
@@ -78,4 +80,20 @@ const createNode = async () => {
     const connection = event.detail;
     console.log('Connection established to:', connection.remotePeer.toString());
   });
+
+  // after applying this hack, discovery starts, but connection is still not 
+  // happening (with nodes behind NAT). Same code works with before-esm version for connectivity
+  // using webrtc-star servers.
+  
+  /*
+  node.components.getTransportManager()
+    .transports.get("@libp2p/webrtc-star")
+    .discovery.addEventListener('peer', evt => {
+      const peerInfo = evt.detail;
+      console.log('Discovered:', peerInfo.id.toString());
+  });
+
+  await node.components.getTransportManager().
+  transports.get("@libp2p/webrtc-star").discovery.start();
+  */
 })()

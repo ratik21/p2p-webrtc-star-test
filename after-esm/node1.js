@@ -13,6 +13,7 @@ import wrtc from "@koush/wrtc";
 
 const createNode = async () => {
   const transportKey = WebRTCStar.prototype[Symbol.toStringTag]
+  const webRTC = new WebRTCStar({ wrtc: wrtc });
   const node = await createLibp2p({
     addresses: {
       listen: [
@@ -30,7 +31,7 @@ const createNode = async () => {
       dialTimeout: 60000
     },
     transports: [
-      new WebRTCStar({ wrtc: wrtc }), new WebSockets(), new TCP()
+      webRTC, new WebSockets(), new TCP()
     ],
     streamMuxers: [
       new Mplex({
@@ -39,6 +40,7 @@ const createNode = async () => {
       })
     ],
     peerDiscovery: [
+      webRTC.discovery,
       new MulticastDNS({
         interval: 1000
       })
