@@ -1,19 +1,18 @@
 /* eslint-disable no-console */
 
 import { createLibp2p } from 'libp2p'
-import { TCP } from '@libp2p/tcp'
-import { Mplex } from '@libp2p/mplex'
-import { Noise } from '@chainsafe/libp2p-noise'
-import { GossipSub } from '@chainsafe/libp2p-gossipsub'
-import { KadDHT } from '@libp2p/kad-dht'
-import { MulticastDNS } from '@libp2p/mdns'
-import { WebRTCStar } from "@libp2p/webrtc-star";
-import { WebSockets } from '@libp2p/websockets'
+import { tcp } from '@libp2p/tcp'
+import { mplex } from '@libp2p/mplex'
+import { noise } from '@chainsafe/libp2p-noise'
+import { gossipsub } from '@chainsafe/libp2p-gossipsub'
+import { kadDHT } from '@libp2p/kad-dht'
+import { mdns } from '@libp2p/mdns'
+import { webRTCStar } from "@libp2p/webrtc-star";
 import wrtc from "@koush/wrtc";
+import { Multiaddr } from 'multiaddr';
 
 const createNode = async () => {
-  const transportKey = WebRTCStar.prototype[Symbol.toStringTag]
-  const webRTC = new WebRTCStar({ wrtc: wrtc });
+  const star = webRTCStar({ wrtc: wrtc });
   const node = await createLibp2p({
     addresses: {
       listen: [
@@ -31,36 +30,31 @@ const createNode = async () => {
       dialTimeout: 60000
     },
     transports: [
-      webRTC, new WebSockets(), new TCP()
+      tcp(),
+      //webSockets(),
+      star.transport
     ],
     streamMuxers: [
-      new Mplex({
+      mplex({
         maxInboundStreams: Infinity,
         maxOutboundStreams: Infinity
       })
     ],
     peerDiscovery: [
-      webRTC.discovery,
-      new MulticastDNS({
+      mdns({
         interval: 1000
-      })
+      }),
+      star.discovery
     ],
     connectionEncryption: [
-      new Noise()
+      noise()
     ],
-    dht: new KadDHT(),
-    pubsub: new GossipSub({
+    dht: kadDHT(),
+    pubsub: gossipsub({
       allowPublishToZeroPeers: true,
       emitSelf: true,
       enabled: true
     }),
-    config: {
-      transport: {
-        [transportKey]: {
-          wrtc // You can use `wrtc` when running in Node.js
-        }
-      }
-    }
   })
 
   await node.start()
@@ -71,29 +65,21 @@ const createNode = async () => {
   const node = await createNode();
   console.log("started node with id: ", node.peerId.toString());
 
-  node.addEventListener('peer:discovery', (event) => {
+  node.addEventListener('peer:discovery', async (event) => {
     const peerInfo = event.detail;
     console.log('Discovered:', peerInfo.id.toString());
+
+    // console.log("dialing..");
+    // try {
+    //   const ma = new Multiaddr(`/dns4/vast-escarpment-62759.herokuapp.com/tcp/443/wss/p2p-webrtc-star/p2p/${peerInfo.id.toString()}`);
+    //   await node.dial(ma);
+    // } catch (error) {
+    //   console.log(error);
+    // }
   });
 
   node.connectionManager.addEventListener('peer:connect', async (event) => {
     const connection = event.detail;
     console.log('Connection established to:', connection.remotePeer.toString());
   });
-
-  // after applying this hack, discovery starts, but connection is still not 
-  // happening (with nodes behind NAT). Same code works with before-esm version for connectivity
-  // using webrtc-star servers.
-  
-  /*
-  node.components.getTransportManager()
-    .transports.get("@libp2p/webrtc-star")
-    .discovery.addEventListener('peer', evt => {
-      const peerInfo = evt.detail;
-      console.log('Discovered:', peerInfo.id.toString());
-  });
-
-  await node.components.getTransportManager().
-  transports.get("@libp2p/webrtc-star").discovery.start();
-  */
 })()
