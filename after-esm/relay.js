@@ -18,9 +18,9 @@ const createNode = async () => {
     addresses: {
       listen: [
         //'/ip4/0.0.0.0/tcp/0',
-        '/ip4/0.0.0.0/tcp/0/ws',
+        //'/ip4/0.0.0.0/tcp/0/ws',
         // custom deployed webrtc-star signalling server
-        //'/dns4/vast-escarpment-62759.herokuapp.com/tcp/443/wss/p2p-webrtc-star/'
+        '/dns4/vast-escarpment-62759.herokuapp.com/tcp/443/wss/p2p-webrtc-star/'
       ]
     },
     addressManager: {
@@ -75,18 +75,18 @@ const createNode = async () => {
   const node = await createNode();
   console.log("started relay node with id: ", node.peerId.toString());
   node.getMultiaddrs().forEach((ma) => console.log(ma.toString()))
-  node.addEventListener('peer:discovery', async (event) => {
-    const peerInfo = event.detail;
-    console.log('Discovered:', peerInfo.id.toString());
+//   node.addEventListener('peer:discovery', async (event) => {
+//     const peerInfo = event.detail;
+//     //console.log('Discovered:', peerInfo.id.toString());
 
-    // console.log("dialing..");
-    // try {
-    //   const ma = new Multiaddr(`/dns4/vast-escarpment-62759.herokuapp.com/tcp/443/wss/p2p-webrtc-star/p2p/${peerInfo.id.toString()}`);
-    //   await node.dial(ma);
-    // } catch (error) {
-    //   console.log(error);
-    // }
-  });
+//     // console.log("dialing..");
+//     // try {
+//     //   const ma = new Multiaddr(`/dns4/vast-escarpment-62759.herokuapp.com/tcp/443/wss/p2p-webrtc-star/p2p/${peerInfo.id.toString()}`);
+//     //   await node.dial(ma);
+//     // } catch (error) {
+//     //   console.log(error);
+//     // }
+//   });
 
   node.connectionManager.addEventListener('peer:connect', async (event) => {
     const connection = event.detail;
