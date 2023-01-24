@@ -18,9 +18,9 @@ const createNode = async () => {
     addresses: {
       listen: [
         //'/ip4/0.0.0.0/tcp/0',
-        //'/ip4/0.0.0.0/tcp/0/ws',
+        '/ip4/0.0.0.0/tcp/0/ws',
         // custom deployed webrtc-star signalling server
-        '/dns4/vast-escarpment-62759.herokuapp.com/tcp/443/wss/p2p-webrtc-star/'
+        //'/dns4/vast-escarpment-62759.herokuapp.com/tcp/443/wss/p2p-webrtc-star/'
       ]
     },
     addressManager: {
